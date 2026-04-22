@@ -2,7 +2,6 @@
   addTrackToQueue,
   findTrackByQuery,
   isRecentDuplicateRequest,
-  isTrackAlreadyInQueue,
 } from "../services/spotify.js";
 
 export function registerAddSongRoute(app) {
@@ -15,17 +14,12 @@ export function registerAddSongRoute(app) {
       }
 
       if (isRecentDuplicateRequest(user, query)) {
-        return res.send("duplicate request");
+        return res.send("duplicate");
       }
 
       const track = await findTrackByQuery(query.trim());
       if (!track) {
         return res.status(404).send("track not found");
-      }
-
-      const alreadyQueued = await isTrackAlreadyInQueue(track.uri);
-      if (alreadyQueued) {
-        return res.send("duplicate track");
       }
 
       await addTrackToQueue(track.uri);
