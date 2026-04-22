@@ -21,6 +21,7 @@ export function registerAddSongRoute(app) {
       if (!track) {
         return res.status(404).send("track not found");
       }
+      res.locals.trackLabel = `${track.name} - ${track.artists?.[0]?.name || "Unknown artist"}`;
 
       await addTrackToQueue(track.uri);
       return res.send("added");
