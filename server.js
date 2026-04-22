@@ -5,7 +5,6 @@ import cors from "cors";
 const app = express();
 
 app.use(cors());
-app.options("*", cors());
 app.use(express.json());
 
 app.use((req, res, next) => {
@@ -151,4 +150,8 @@ app.post("/add-song", async (req, res) => {
     }
 });
 
-app.listen(3000);
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+    console.log(`🌍 Serveur actif sur port ${PORT}`);
+});
