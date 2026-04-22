@@ -10,10 +10,14 @@ app.use(cors());
 app.use(express.json());
 
 app.use((req, res, next) => {
+  const isWidgetStatePoll = req.method === "GET" && req.url === "/widget-state";
+
   if (req.method === "POST" && req.url === "/add-song") {
     const query = req.body?.query ?? "";
     const user = req.body?.user ?? "";
     console.log(`[REQ] POST /add-song query="${query}" user="${user}"`);
+  } else if (isWidgetStatePoll) {
+    // silence widget polling logs
   } else {
     const bodyLog = req.body && Object.keys(req.body).length ? JSON.stringify(req.body) : "{}";
     console.log(`[REQ] ${req.method} ${req.url} body=${bodyLog}`);
@@ -26,6 +30,8 @@ app.use((req, res, next) => {
         typeof payload === "string" ? payload : JSON.stringify(payload);
       const trackLog = res.locals?.trackLabel ? ` track="${res.locals.trackLabel}"` : "";
       console.log(`[RES] POST /add-song status=${res.statusCode} result="${result}"${trackLog}`);
+    } else if (isWidgetStatePoll) {
+      // silence widget polling logs
     } else {
       const responseLog =
         typeof payload === "string" ? payload : JSON.stringify(payload);
