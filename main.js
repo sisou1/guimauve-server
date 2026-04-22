@@ -2,6 +2,7 @@
 import cors from "cors";
 import { registerAddSongRoute } from "./routes/add-song.js";
 import { registerSkipRoute } from "./routes/skip.js";
+import { registerWidgetStateRoute } from "./routes/widget-state.js";
 
 const app = express();
 
@@ -42,6 +43,7 @@ app.get("/", (_req, res) => {
 
 registerAddSongRoute(app);
 registerSkipRoute(app);
+registerWidgetStateRoute(app);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

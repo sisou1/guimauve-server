@@ -3,6 +3,7 @@
   findTrackByQuery,
   isRecentDuplicateRequest,
 } from "../services/spotify.js";
+import { setLastAddEvent } from "../services/widget-state.js";
 
 export function registerAddSongRoute(app) {
   app.post("/add-song", async (req, res) => {
@@ -24,6 +25,7 @@ export function registerAddSongRoute(app) {
       res.locals.trackLabel = `${track.name} - ${track.artists?.[0]?.name || "Unknown artist"}`;
 
       await addTrackToQueue(track.uri);
+      setLastAddEvent(track);
       return res.send("added");
     } catch (error) {
       console.error("POST /add-song failed:", error.response?.data || error.message);
