@@ -21,8 +21,10 @@ app.use((req, res, next) => {
   const originalSend = res.send.bind(res);
   res.send = (payload) => {
     if (req.method === "POST" && req.url === "/add-song") {
+      const result =
+        typeof payload === "string" ? payload : JSON.stringify(payload);
       const trackLog = res.locals?.trackLabel ? ` track="${res.locals.trackLabel}"` : "";
-      console.log(`[RES] POST /add-song status=${res.statusCode}${trackLog}`);
+      console.log(`[RES] POST /add-song status=${res.statusCode} result="${result}"${trackLog}`);
     } else {
       const responseLog =
         typeof payload === "string" ? payload : JSON.stringify(payload);
