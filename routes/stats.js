@@ -5,7 +5,7 @@ function escapeHtml(value) {
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
+    .replace(/\"/g, "&quot;")
     .replace(/'/g, "&#39;");
 }
 
@@ -36,7 +36,7 @@ function buildStatsPage(snapshot) {
         .join("")
     : `
       <tr>
-        <td colspan="4">Aucune donnée pour le moment</td>
+        <td colspan="4">Aucune donnee pour le moment</td>
       </tr>
     `;
 
@@ -45,16 +45,32 @@ function buildStatsPage(snapshot) {
         .map(
           (track) => `
             <tr>
-              <td>${escapeHtml(track.title || "Titre inconnu")} - ${escapeHtml(track.artist || "Artiste inconnu")}</td>
+              <td>${escapeHtml(track.title || "Titre inconnu")}</td>
               <td>${Number(track.count || 0)}</td>
-              <td>${Number(track.artistUsage || 0)}</td>
             </tr>
           `
         )
         .join("")
     : `
       <tr>
-        <td colspan="3">Aucune donnée pour le moment</td>
+        <td colspan="2">Aucune donnee pour le moment</td>
+      </tr>
+    `;
+
+  const artistsRows = snapshot.topArtists.length
+    ? snapshot.topArtists
+        .map(
+          (artist) => `
+            <tr>
+              <td>${escapeHtml(artist.artist || "Artiste inconnu")}</td>
+              <td>${Number(artist.count || 0)}</td>
+            </tr>
+          `
+        )
+        .join("")
+    : `
+      <tr>
+        <td colspan="2">Aucune donnee pour le moment</td>
       </tr>
     `;
 
@@ -85,9 +101,9 @@ function buildStatsPage(snapshot) {
         grid-template-columns: 1fr;
         gap: 16px;
       }
-      @media (min-width: 980px) {
+      @media (min-width: 1100px) {
         .grid {
-          grid-template-columns: 1fr 1fr;
+          grid-template-columns: 1.2fr 1fr 1fr;
           align-items: start;
         }
       }
@@ -108,7 +124,7 @@ function buildStatsPage(snapshot) {
   <body>
     <div class="card">
       <h1>Statistiques du serveur Spotify Bot</h1>
-      <p class="muted">Dernière mise à jour : ${escapeHtml(formatDate(snapshot.updatedAt))}</p>
+      <p class="muted">Derniere mise a jour : ${escapeHtml(formatDate(snapshot.updatedAt))}</p>
       <p><strong>Total commandes :</strong> ${snapshot.totals.commands}</p>
       <p><strong>Total ajouts :</strong> ${snapshot.totals.adds}</p>
       <p><strong>Total skips :</strong> ${snapshot.totals.skips}</p>
@@ -133,17 +149,31 @@ function buildStatsPage(snapshot) {
       </div>
 
       <div class="card">
-        <h2>Songs</h2>
+        <h2>Musiques</h2>
         <table>
           <thead>
             <tr>
-              <th>Song</th>
-              <th>Utilisation son</th>
-              <th>Utilisation artiste</th>
+              <th>Titre</th>
+              <th>Nombre d'utilisations</th>
             </tr>
           </thead>
           <tbody>
             ${songsRows}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <h2>Artistes</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Artiste</th>
+              <th>Nombre d'utilisations</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${artistsRows}
           </tbody>
         </table>
       </div>

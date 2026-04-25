@@ -142,15 +142,11 @@ export function getAnalyticsSnapshot(limit = 20) {
 
   const topTracks = Object.values(state.tracks)
     .sort((a, b) => b.count - a.count || (b.lastAddedAt || 0) - (a.lastAddedAt || 0))
-    .slice(0, limit)
-    .map((track) => {
-      const artistLabel = String(track?.artist || "Artiste inconnu").trim() || "Artiste inconnu";
-      const artistKey = artistLabel.toLowerCase();
-      return {
-        ...track,
-        artistUsage: Number(artistCounts[artistKey]?.count || 0),
-      };
-    });
+    .slice(0, limit);
+
+  const topArtists = Object.values(artistCounts)
+    .sort((a, b) => b.count - a.count || a.artist.localeCompare(b.artist))
+    .slice(0, limit);
 
   const users = Object.entries(state.users)
     .map(([user, stats]) => ({
@@ -169,6 +165,7 @@ export function getAnalyticsSnapshot(limit = 20) {
     },
     users,
     topTracks,
+    topArtists,
     updatedAt: state.updatedAt,
   };
 }
