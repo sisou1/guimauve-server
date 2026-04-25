@@ -45,9 +45,9 @@ function buildStatsPage(snapshot) {
         .map(
           (track) => `
             <tr>
-              <td>${escapeHtml(track.title || "Titre inconnu")}</td>
-              <td>${escapeHtml(track.artist || "Artiste inconnu")}</td>
+              <td>${escapeHtml(track.title || "Titre inconnu")} - ${escapeHtml(track.artist || "Artiste inconnu")}</td>
               <td>${Number(track.count || 0)}</td>
+              <td>${Number(track.artistUsage || 0)}</td>
             </tr>
           `
         )
@@ -137,9 +137,9 @@ function buildStatsPage(snapshot) {
         <table>
           <thead>
             <tr>
-              <th>Titre</th>
-              <th>Artiste</th>
-              <th>Utilisations</th>
+              <th>Song</th>
+              <th>Utilisation son</th>
+              <th>Utilisation artiste</th>
             </tr>
           </thead>
           <tbody>

@@ -127,9 +127,30 @@ export function recordSkip({ user }) {
 }
 
 export function getAnalyticsSnapshot(limit = 20) {
+  const artistCounts = {};
+  for (const track of Object.values(state.tracks)) {
+    const artistLabel = String(track?.artist || "Artiste inconnu").trim() || "Artiste inconnu";
+    const artistKey = artistLabel.toLowerCase();
+    if (!artistCounts[artistKey]) {
+      artistCounts[artistKey] = {
+        artist: artistLabel,
+        count: 0,
+      };
+    }
+    artistCounts[artistKey].count += Number(track?.count || 0);
+  }
+
   const topTracks = Object.values(state.tracks)
     .sort((a, b) => b.count - a.count || (b.lastAddedAt || 0) - (a.lastAddedAt || 0))
-    .slice(0, limit);
+    .slice(0, limit)
+    .map((track) => {
+      const artistLabel = String(track?.artist || "Artiste inconnu").trim() || "Artiste inconnu";
+      const artistKey = artistLabel.toLowerCase();
+      return {
+        ...track,
+        artistUsage: Number(artistCounts[artistKey]?.count || 0),
+      };
+    });
 
   const users = Object.entries(state.users)
     .map(([user, stats]) => ({
