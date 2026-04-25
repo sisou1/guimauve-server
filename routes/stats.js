@@ -36,16 +36,34 @@ function buildStatsPage(snapshot) {
         .join("")
     : `
       <tr>
-        <td colspan="4">No data yet</td>
+        <td colspan="4">Aucune donnée pour le moment</td>
+      </tr>
+    `;
+
+  const songsRows = snapshot.topTracks.length
+    ? snapshot.topTracks
+        .map(
+          (track) => `
+            <tr>
+              <td>${escapeHtml(track.title || "Titre inconnu")}</td>
+              <td>${escapeHtml(track.artist || "Artiste inconnu")}</td>
+              <td>${Number(track.count || 0)}</td>
+            </tr>
+          `
+        )
+        .join("")
+    : `
+      <tr>
+        <td colspan="3">Aucune donnée pour le moment</td>
       </tr>
     `;
 
   return `<!doctype html>
-<html lang="en">
+<html lang="fr">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Server Stats</title>
+    <title>Statistiques Serveur</title>
     <style>
       :root { color-scheme: light; }
       body {
@@ -61,6 +79,17 @@ function buildStatsPage(snapshot) {
         border-radius: 10px;
         padding: 16px;
         margin-bottom: 16px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      @media (min-width: 980px) {
+        .grid {
+          grid-template-columns: 1fr 1fr;
+          align-items: start;
+        }
       }
       h1, h2 { margin-top: 0; }
       table {
@@ -78,28 +107,46 @@ function buildStatsPage(snapshot) {
   </head>
   <body>
     <div class="card">
-      <h1>Spotify Bot Server Stats</h1>
-      <p class="muted">Last update: ${escapeHtml(formatDate(snapshot.updatedAt))}</p>
-      <p><strong>Total commands:</strong> ${snapshot.totals.commands}</p>
-      <p><strong>Total adds:</strong> ${snapshot.totals.adds}</p>
-      <p><strong>Total skips:</strong> ${snapshot.totals.skips}</p>
+      <h1>Statistiques du serveur Spotify Bot</h1>
+      <p class="muted">Dernière mise à jour : ${escapeHtml(formatDate(snapshot.updatedAt))}</p>
+      <p><strong>Total commandes :</strong> ${snapshot.totals.commands}</p>
+      <p><strong>Total ajouts :</strong> ${snapshot.totals.adds}</p>
+      <p><strong>Total skips :</strong> ${snapshot.totals.skips}</p>
     </div>
 
-    <div class="card">
-      <h2>Users</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>User</th>
-            <th>Adds</th>
-            <th>Skips</th>
-            <th>Total Commands</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${usersRows}
-        </tbody>
-      </table>
+    <div class="grid">
+      <div class="card">
+        <h2>Utilisateurs</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Utilisateur</th>
+              <th>Ajouts</th>
+              <th>Skips</th>
+              <th>Total commandes</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${usersRows}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <h2>Songs</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Titre</th>
+              <th>Artiste</th>
+              <th>Utilisations</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${songsRows}
+          </tbody>
+        </table>
+      </div>
     </div>
   </body>
 </html>`;
