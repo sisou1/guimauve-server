@@ -1,4 +1,5 @@
-﻿import axios from "axios";
+import axios from "axios";
+import { isPlaybackMockEnabled, runtimeMode } from "./runtime-config.js";
 
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
@@ -193,6 +194,11 @@ export async function findTrackByQuery(query) {
 }
 
 export async function isTrackAlreadyInQueue(trackUri) {
+  if (isPlaybackMockEnabled) {
+    console.log(`[MOCK:${runtimeMode}] isTrackAlreadyInQueue uri="${trackUri}" -> false`);
+    return false;
+  }
+
   return withAccessToken(async (token) => {
     const response = await axios.get("https://api.spotify.com/v1/me/player/queue", {
       headers: {
@@ -208,6 +214,11 @@ export async function isTrackAlreadyInQueue(trackUri) {
 }
 
 export async function addTrackToQueue(trackUri) {
+  if (isPlaybackMockEnabled) {
+    console.log(`[MOCK:${runtimeMode}] addTrackToQueue uri="${trackUri}"`);
+    return;
+  }
+
   return withAccessToken(async (token) => {
     await axios.post("https://api.spotify.com/v1/me/player/queue", null, {
       params: { uri: trackUri },
@@ -219,6 +230,11 @@ export async function addTrackToQueue(trackUri) {
 }
 
 export async function skipCurrentTrack() {
+  if (isPlaybackMockEnabled) {
+    console.log(`[MOCK:${runtimeMode}] skipCurrentTrack`);
+    return;
+  }
+
   return withAccessToken(async (token) => {
     await axios.post("https://api.spotify.com/v1/me/player/next", null, {
       headers: {

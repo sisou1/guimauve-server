@@ -1,8 +1,11 @@
-﻿import express from "express";
+import express from "express";
 import cors from "cors";
 import { registerAddSongRoute } from "./routes/add-song.js";
 import { registerSkipRoute } from "./routes/skip.js";
 import { registerWidgetStateRoute } from "./routes/widget-state.js";
+import { registerStatsRoute } from "./routes/stats.js";
+import { initializeAnalytics } from "./services/analytics.js";
+import { isPlaybackMockEnabled, runtimeMode } from "./services/runtime-config.js";
 
 const app = express();
 
@@ -26,15 +29,13 @@ app.use((req, res, next) => {
   const originalSend = res.send.bind(res);
   res.send = (payload) => {
     if (req.method === "POST" && req.url === "/add-song") {
-      const result =
-        typeof payload === "string" ? payload : JSON.stringify(payload);
+      const result = typeof payload === "string" ? payload : JSON.stringify(payload);
       const trackLog = res.locals?.trackLabel ? ` track="${res.locals.trackLabel}"` : "";
       console.log(`[RES] POST /add-song status=${res.statusCode} result="${result}"${trackLog}`);
     } else if (isWidgetStatePoll) {
       // no-op
     } else {
-      const responseLog =
-        typeof payload === "string" ? payload : JSON.stringify(payload);
+      const responseLog = typeof payload === "string" ? payload : JSON.stringify(payload);
       console.log(`[RES] ${req.method} ${req.url} status=${res.statusCode} body=${responseLog}`);
     }
     return originalSend(payload);
@@ -50,8 +51,20 @@ app.get("/", (_req, res) => {
 registerAddSongRoute(app);
 registerSkipRoute(app);
 registerWidgetStateRoute(app);
+registerStatsRoute(app);
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
+
+async function startServer() {
+  await initializeAnalytics();
+  app.listen(PORT, () => {
+    console.log(
+      `Server listening on port ${PORT} (mode=${runtimeMode}, playbackMock=${isPlaybackMockEnabled})`
+    );
+  });
+}
+
+startServer().catch((error) => {
+  console.error("Server startup failed:", error.message);
+  process.exit(1);
 });

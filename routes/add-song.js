@@ -1,8 +1,9 @@
-﻿import {
+import {
   addTrackToQueue,
   findTrackByQuery,
   isRecentDuplicateRequest,
 } from "../services/spotify.js";
+import { recordAdd } from "../services/analytics.js";
 import { setLastAddEvent } from "../services/widget-state.js";
 
 export function registerAddSongRoute(app) {
@@ -26,6 +27,7 @@ export function registerAddSongRoute(app) {
 
       await addTrackToQueue(track.uri);
       setLastAddEvent(track);
+      recordAdd({ user, track });
       return res.send("added");
     } catch (error) {
       console.error("POST /add-song failed:", error.response?.data || error.message);
